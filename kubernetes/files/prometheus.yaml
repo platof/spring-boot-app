@@ -1,0 +1,96 @@
+global:
+    pspEnabled: true
+
+prometheusOperator:
+  admissionWebhooks:
+    enabled: false
+  tls:
+    enabled: false
+
+kubeScheduler:
+  enabled: false
+
+kubeEtcd:
+  enabled: false
+
+kubeDns:
+  enabled: false
+
+kubeApiServer:
+  enabled: false
+
+kubeProxy:
+  enabled: false
+
+kubeControllerManager:
+  enabled: false
+
+defaultRules:
+  create: false
+
+grafana:
+  enabled: ${grafana_enabled}
+  resources:
+    limits:
+      memory: ${grafana_resources.mem_limit}
+    requests:
+      cpu: ${grafana_resources.cpu_request}
+      memory: ${grafana_resources.mem_request}
+
+  admin:
+    existingSecret: grafana-admin-secret
+    userKey: admin-user
+    passwordKey: admin-password
+
+  forceDeployDashboards: true
+
+  persistence:
+    type: pvc
+    enabled: ${enable_grafana_storage}
+    storageClassName: ${storage_class_type}
+    accessModes:
+      - ReadWriteOnce
+    size: ${grafana_storage_size}
+    finalizers:
+      - kubernetes.io/pvc-protection
+
+alertmanager:
+  enabled: false
+
+prometheus:
+  prometheusSpec:
+    serviceMonitorNamespaceSelector: {}
+    serviceMonitorSelector: {}
+    serviceMonitorSelectorNilUsesHelmValues: false
+    retention: ${prometheus_retention_days}
+    resources:
+      requests:
+        memory: ${prometheus_resource_requests}
+    
+
+
+prometheus-node-exporter:
+  priorityClassName: "system-cluster-critical"
+  resources:
+    limits:
+      cpu: ${node_exporter_resources.cpu_limit}
+      memory: ${node_exporter_resources.mem_limit}
+    requests:
+      cpu: ${node_exporter_resources.cpu_request}
+      memory: ${node_exporter_resources.mem_request}
+
+prometheusOperator:
+  resources: 
+    limits:
+      memory: ${prom_operator_resources.mem_limit}
+    requests:
+      cpu: ${prom_operator_resources.cpu_request}
+      memory: ${prom_operator_resources.mem_request}
+
+kube-state-metrics:
+  resources: 
+    limits:
+      memory: ${kube_state_resources.mem_limit}
+    requests:
+      cpu: ${kube_state_resources.cpu_request}
+      memory: ${kube_state_resources.mem_request}

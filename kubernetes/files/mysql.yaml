@@ -1,0 +1,15 @@
+auth:
+  rootPassword: "${mysqlRootPassword}"
+  database: "${mysqlDatabase}"
+primary:
+  podSecurityContext:
+    fsGroup: 1001
+  containerSecurityContext:
+    runAsUser: 1001
+    runAsNonRoot: true
+  persistence:
+    enabled: false
+    size: 10Gi
+service:
+  type: ClusterIP
+  port: 3306
