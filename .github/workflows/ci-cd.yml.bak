@@ -10,15 +10,18 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      short_hash: ${{ steps.get_commit.outputs.short_hash }}
+      short_hash: ${{ steps.commit.outputs.hash }}
 
     steps:
       # Checkout the code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - id: get_commit
-        run: echo "::set-output name=short_hash::$(git rev-parse --short HEAD)"
+      # Get the short commit hash using pr-mpt/actions-commit-hash
+      - id: commit
+        uses: pr-mpt/actions-commit-hash@v1
+        with:
+          short: true # Ensures only the short hash is generated
 
       # Log in to Docker registry
       - name: Log in to Docker Hub
@@ -27,12 +30,12 @@ jobs:
       # Build Docker image
       - name: Build Docker image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/java-app:${{ steps.get_commit.outputs.short_hash }} .
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/java-app:${{ steps.commit.outputs.hash }} .
 
       # Push Docker image
       - name: Push Docker image
         run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/java-app:${{ steps.get_commit.outputs.short_hash }}
+          docker push ${{ secrets.DOCKER_USERNAME }}/java-app:${{ steps.commit.outputs.hash }}
 
   deploy:
     runs-on: ubuntu-latest
