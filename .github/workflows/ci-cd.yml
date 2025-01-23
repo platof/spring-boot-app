@@ -9,10 +9,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    env:
-      EKS_CLUSTER_NAME: java-app-cluster
-      AWS_REGION: us-east-1
-
     steps:
       # Checkout the code
       - name: Checkout code
@@ -25,20 +21,25 @@ jobs:
           java-version: 17
           distribution: temurin
 
+      # Retrieve the commit hash
+      - id: commit
+        uses: pr-mpt/actions-commit-hash@v1
+        with:
+          short: true
 
       # Build Docker image
       - name: Build Docker image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/java-app:${{ github.sha }} .
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/java-app:${{ steps.commit.outputs.hash  }} .
 
-      # Log in to Docker registry (example: AWS ECR)
+      # Log in to Docker registry
       - name: Log in to Docker Hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login --username ${{ secrets.DOCKER_USERNAME }} --password-stdin
 
       # Push the Docker image
       - name: Push Docker image
         run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/java-app:${{ github.sha }}
+          docker push ${{ secrets.DOCKER_USERNAME }}/java-app:${{ steps.commit.outputs.hash }}
 
   deploy:
     runs-on: ubuntu-latest
@@ -55,15 +56,15 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
+          aws-region: ${{ secrets.AWS_REGION }}
 
       # Update kubeconfig to access the EKS cluster
       - name: Update kubeconfig
         run: |
-          aws eks update-kubeconfig --region us-east-1 --name java-app-cluster
+          aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name ${{ secrets.EKS_CLUSTER_NAME }}
 
       # Deploy the application to EKS
       - name: Deploy to EKS
         run: |
-          kubectl set image deployment/java-app java-app=${{ secrets.DOCKER_USERNAME }}/java-app:${{ github.sha }}
+          kubectl set image deployment/java-app java-app=${{ secrets.DOCKER_USERNAME }}/java-app:${{ needs.build.outputs.short_hash }}
           kubectl rollout status deployment/java-app
