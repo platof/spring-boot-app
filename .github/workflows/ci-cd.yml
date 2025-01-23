@@ -28,8 +28,8 @@ jobs:
           short: true
 
       - name: Save commit hash
-        run: echo "::set-output name=short_hash::${{ steps.commit.outputs.hash }}"
-        shell: bash
+        run: echo "short_hash=${{ steps.commit.outputs.hash }}" >> $GITHUB_OUTPUT
+    
 
       # Log in to Docker registry
       - name: Log in to Docker Hub
