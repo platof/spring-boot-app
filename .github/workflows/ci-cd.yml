@@ -23,10 +23,6 @@ jobs:
         with:
           short: true # Ensures only the short hash is generated
 
-      # Debug the short hash to verify
-      - name: Debug Commit Hash
-        run: echo "Commit Hash: ${{ steps.commit.outputs.hash }}"
-
       # Log in to Docker registry
       - name: Log in to Docker Hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login --username ${{ secrets.DOCKER_USERNAME }} --password-stdin
