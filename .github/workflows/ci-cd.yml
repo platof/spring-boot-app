@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
   
     outputs:
-      commit_hash: ${{ steps.get_commit.outputs.commit_hash }}
+      short_hash: ${{ steps.commit.outputs.hash }}
 
     steps:
       # Checkout the code
@@ -24,9 +24,11 @@ jobs:
           java-version: 17
           distribution: temurin
 
-      # Get the commit hash
-      - id: get_commit
-        run: echo "commit_hash=$(git rev-parse --short HEAD)"
+      - id: commit
+        uses: pr-mpt/actions-commit-hash@v1
+        with:
+          short: true
+
 
       # Log in to Docker registry
       - name: Log in to Docker Hub
@@ -35,12 +37,12 @@ jobs:
       # Build Docker image         
       - name: Build Docker image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/java-app:$${{ steps.get_commit.outputs.commit_hash }} .
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/java-app:$${{ steps.commit.outputs.hash }} .
 
       # Push the Docker image
       - name: Push Docker image
         run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/java-app:${{ steps.get_commit.outputs.commit_hash }}
+          docker push ${{ secrets.DOCKER_USERNAME }}/java-app:${{ steps.commit.outputs.hash }}
 
   deploy:
     runs-on: ubuntu-latest
@@ -67,5 +69,5 @@ jobs:
       # Deploy the application to EKS
       - name: Deploy to EKS
         run: |
-          kubectl set image deployment/java-app java-app=${{ secrets.DOCKER_USERNAME }}/java-app:${{ needs.build.outputs.commit_hash }}
+          kubectl set image deployment/java-app java-app=${{ secrets.DOCKER_USERNAME }}/java-app:${{ needs.build.outputs.short_hash }}
           kubectl rollout status deployment/java-app
