@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  aws-region: us-east-1
+  aws_region: us-east-1
   eks_cluster_name: java-app-cluster
 
 jobs:
