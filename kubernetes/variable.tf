@@ -111,7 +111,7 @@ variable "prometheus_retention_days" {
 }
 
 variable "mysql_database" {
-  type = string
+  type        = string
   description = "mysql database name"
-  default = "challenge"
+  default     = "challenge"
 }

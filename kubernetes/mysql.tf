@@ -3,7 +3,7 @@ resource "helm_release" "mysql" {
   depends_on = [module.eks, kubernetes_namespace.namespaces]
   namespace  = var.app_namespace
   repository = "https://charts.bitnami.com/bitnami"
-  chart = "mysql"
+  chart      = "mysql"
   version    = "11.1.17"
 
   values = [templatefile(

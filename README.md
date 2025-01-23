@@ -10,7 +10,6 @@ This project demonstrates a CI/CD pipeline for deploying a Java application to A
 - Terraform
 
 ## Steps
-- Generating the jar file before building
 - Creating a Dockerfile for the application
 - Pushing the dockerfile to Docker Registry
 - Set up Eks cluster using terraform 

@@ -25,13 +25,13 @@ resource "helm_release" "prometheus_operator" {
   version          = var.prometheus_helm_version
   repository       = "https://prometheus-community.github.io/helm-charts"
   namespace        = var.monitoring_namespace
-  timeout = 600
+  timeout          = 600
   cleanup_on_fail  = true
   create_namespace = true
 
   values = [templatefile(
     "${path.cwd}/files/prometheus.yaml", {
-      grafana_enabled: var.grafana_enabled
+      grafana_enabled : var.grafana_enabled
       STORAGE_CLASS : var.storage_class_type,
       grafana_resources : var.grafana_resources,
       prom_operator_resources : var.prom_operator_resources,
