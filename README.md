@@ -36,7 +36,7 @@ terraform apply
 ``` 
 
 This will deploy the EKS cluster, Mysql database, Java Application, as well as Prometheus and Grafana for monitoring.   
-Run the below command to Update your kubeconfig to include access credentials for Kubectl to interact with EKS cluster.
+### Run the below command to Update your kubeconfig file to include access credentials for Kubectl to interact with EKS cluster.
 
 ```bash
 aws eks --region us-east-1 update-kubeconfig --name <cluster-name> 
