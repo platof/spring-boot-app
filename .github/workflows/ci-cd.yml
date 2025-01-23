@@ -24,6 +24,8 @@ jobs:
       # Get the commit hash
       - id: get_commit
         run: echo "commit_hash=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+        env:
+          GITHUB_OUTPUT: short_hash
 
       # Log in to Docker registry
       - name: Log in to Docker Hub
@@ -32,12 +34,14 @@ jobs:
       # Build Docker image         
       - name: Build Docker image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/java-app:${{ env.commit_hash  }} .
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/java-app:${{ env.short_hash  }} .
 
       # Push the Docker image
       - name: Push Docker image
         run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/java-app:${{ env.commit_hash }}
+          docker push ${{ secrets.DOCKER_USERNAME }}/java-app:${{ env.short_hash }}
+        env:
+          short_hash: ${{ env.short_hash }}
 
   deploy:
     runs-on: ubuntu-latest
@@ -64,5 +68,5 @@ jobs:
       # Deploy the application to EKS
       - name: Deploy to EKS
         run: |
-          kubectl set image deployment/java-app java-app=${{ secrets.DOCKER_USERNAME }}/java-app:${{ env.commit_hash }}
+          kubectl set image deployment/java-app java-app=${{ secrets.DOCKER_USERNAME }}/java-app:${{ needs.build.outputs.short_hash }}
           kubectl rollout status deployment/java-app
