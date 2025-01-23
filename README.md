@@ -19,8 +19,8 @@ This project demonstrates a CI/CD pipeline for deploying a Java application to A
 
 ## Build and Push the Docker Image
 ```bash
-docker build -t <platof/java-app:<tag> .
-docker push <platof/java-app:<tag>
+docker build -t platof/java-app:<tag> .
+docker push platof/java-app:<tag>
 ```
 
 ## infrastructure setup
@@ -75,7 +75,7 @@ The ci-cd.yml file can be found in the .github/workflows/ directory. It comprise
 - Updates the EKS kubeconfig 
 - Deployes the update image using kubectl set image
 
-## monitoring 
+## Monitoring 
 Prometheus and Grafana were preconfigure for monitoring
 ```bash
 kubectl port-forward svc/kube-prometheus-stack-grafana 3000:80 -n monitoring

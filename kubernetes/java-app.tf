@@ -1,13 +1,3 @@
-#resource "kubernetes_service_account" "java_app_sa" {
-#  metadata {
-#    name      = "java-app-sa"
-#    namespace = var.app_namespace
-#    annotations = {
-#      "eks.amazonaws.com/role-arn" = aws_iam_role.java_app_role.arn
-#    }
-#  }
-#}
-
 resource "kubernetes_deployment" "java_app" {
   depends_on = [kubernetes_namespace.namespaces, helm_release.mysql, kubernetes_config_map.java_app_config, module.eks]
   metadata {
@@ -140,4 +130,9 @@ resource "kubernetes_service" "java_app_service" {
     }
     type = "LoadBalancer"
   }
+}
+
+output "load_balancer_dns" {
+  value = kubernetes_service.java_app_service.status[0].load_balancer[0].ingress[0].hostname
+  description = "The DNS name of the load balancer"
 }
