@@ -8,7 +8,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-  
+
     outputs:
       short_hash: ${{ steps.commit.outputs.hash }}
 
@@ -17,29 +17,26 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Set up JDK
-      - name: Set up JDK
-        uses: actions/setup-java@v3
-        with:
-          java-version: 17
-          distribution: temurin
-
+      # Get the short commit hash using pr-mpt/actions-commit-hash
       - id: commit
         uses: pr-mpt/actions-commit-hash@v1
         with:
-          short: true
+          short: true # Ensures only the short hash is generated
 
+      # Debug the short hash to verify
+      - name: Debug Commit Hash
+        run: echo "Commit Hash: ${{ steps.commit.outputs.hash }}"
 
       # Log in to Docker registry
       - name: Log in to Docker Hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login --username ${{ secrets.DOCKER_USERNAME }} --password-stdin
 
-      # Build Docker image         
+      # Build Docker image
       - name: Build Docker image
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/java-app:${{ steps.commit.outputs.hash }} .
 
-      # Push the Docker image
+      # Push Docker image
       - name: Push Docker image
         run: |
           docker push ${{ secrets.DOCKER_USERNAME }}/java-app:${{ steps.commit.outputs.hash }}
