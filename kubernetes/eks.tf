@@ -1,6 +1,6 @@
 provider "aws" {
   region  = local.region
-  profile = "femi-admin"
+  profile = ""
 }
 
 module "vpc" {
